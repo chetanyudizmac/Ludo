@@ -1,0 +1,42 @@
+{
+    "android": {
+        "AdMob": {
+            "test": false, 
+            "ads": {
+                "bottom_ad": {
+                    "width": 0, 
+                    "type": "banner", 
+                    "id": "ca-app-pub-5405617765701389/5271720952", 
+                    "alignment": "bottom", 
+                    "height": 0
+                }, 
+                "fs_ad": {
+                    "type": "interstitial", 
+                    "id": "ca-app-pub-5405617765701389/6748454150"
+                },
+				"back_fs_ad": {
+                    "type": "interstitial", 
+                    "id": "ca-app-pub-5405617765701389/7214222152"
+                }
+            }
+        }
+    }, 
+    "ios": {
+        "AdMob": {
+            "test": true, 
+            "ads": {
+                "bottom_ad": {
+                    "width": 0, 
+                    "type": "banner", 
+                    "id": "ca-app-pub-5405617765701389/6753818158", 
+                    "alignment": "bottom", 
+                    "height": 0
+                }, 
+                "fs_ad": {
+                    "type": "interstitial", 
+                    "id": "ca-app-pub-5405617765701389/9707284554"
+                }
+            }
+        }
+    }
+}

@@ -8,7 +8,15 @@ public class Tile : MonoBehaviour {
 
 		public int tileNumber;
 
-		RegionType regionType;
+		 private RegionType _regionType;
+
+		public RegionType RegionType{
+			get{ return _regionType;}
+			set{ _regionType = value;}
+		}
+
+
+		public bool isSafePlace;
 
 
 }

@@ -26,7 +26,7 @@ public class ViewLoading : UIView
 	IEnumerator StartWelcomeScreen()
 	{
 		yield return new WaitForSeconds (3f);
-			ViewController.instance.ChangeView (ViewController.instance.viewLocalMode);
+			ViewController.instance.ChangeView (ViewController.instance.viewWelcome);
 	}
 }
 }

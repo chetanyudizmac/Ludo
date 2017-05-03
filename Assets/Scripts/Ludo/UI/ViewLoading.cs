@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+namespace Games.Ludo{
+
 public class ViewLoading : UIView 
 {
 	public static ViewLoading instance;
@@ -23,6 +26,7 @@ public class ViewLoading : UIView
 	IEnumerator StartWelcomeScreen()
 	{
 		yield return new WaitForSeconds (3f);
-		ViewController.instance.ChangeView (ViewController.instance.viewWelcome);
+			ViewController.instance.ChangeView (ViewController.instance.viewLocalMode);
 	}
+}
 }

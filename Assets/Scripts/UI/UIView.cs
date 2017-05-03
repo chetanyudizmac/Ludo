@@ -20,8 +20,6 @@ public class UIView : MonoBehaviour {
 	public virtual void Awake() {
 		cam = this.GetComponent<Camera>();
 		canvases = this.GetComponentsInChildren<Canvas>();
-
-
 		Application.targetFrameRate = 60;
 	}
 

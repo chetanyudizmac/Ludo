@@ -2,13 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-public class ViewWelcome : UIView 
+
+namespace Games.Ludo{
+public class ViewLocalMode : UIView 
 {
-	public static ViewWelcome instance;
+	public static ViewLocalMode instance;
+
 	public Image[] buttonsImage;
-	public Color[] buttonColors;
-	int currentSelectedbutton;
+
+	Color[] buttonColors=new Color[] {Color.red, Color.green,Color.blue,Color.yellow};
+	int selectedColor=0;
 	Image currentSelectedButtonImage;
+
 	public override void Awake ()
 	{
 		base.Awake ();
@@ -17,7 +22,6 @@ public class ViewWelcome : UIView
 	public override void Show()
 	{
 		base.Show ();
-		Debug.Log ("Inside View Welcome");
 		currentSelectedButtonImage = buttonsImage [0];
 
 	}
@@ -25,13 +29,19 @@ public class ViewWelcome : UIView
 	{
 		base.Hide();
 	}
-	public void SelectColorButtonClick(int buttonNo)
-	{
+
+	public void SelectColorButtonClick(int buttonNo){
 		currentSelectedButtonImage.color = Color.white;
 		currentSelectedButtonImage = buttonsImage [buttonNo];
 		buttonsImage [buttonNo].color = buttonColors [buttonNo];
-		currentSelectedbutton = buttonNo;
-		Debug.Log ("Button Clicked");
+		selectedColor = buttonNo;		
 	}
 
+	public void PlayButtonClicked(){
+			Board.instance.SetRegions (selectedColor);
+			Hide ();
+			ViewInPlay.instance.Show ();
+	}
+
+	}
 }

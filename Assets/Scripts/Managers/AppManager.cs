@@ -7,7 +7,7 @@ public class AppManager : MonoBehaviour {
 	public static AppManager instance;
 	public string buildNumber = "";
 
-	private GameManager currentGameManager;
+	//private GameManager currentGameManager;
 
 	void Awake(){
 		instance = this;
@@ -24,7 +24,7 @@ public class AppManager : MonoBehaviour {
 
 
 	public void UnloadCurrentGame() {
-		Destroy(currentGameManager.gameObject);
+	//	Destroy(currentGameManager.gameObject);
 	}
 
 

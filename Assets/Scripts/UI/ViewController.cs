@@ -9,9 +9,9 @@ public class ViewController : MonoBehaviour {
 	public static ViewController instance;
 
 	public UIView viewLoading;
-	public UIView viewWelcome;
+	public UIView viewLocalMode;
 	public UIView viewInPlay;
-
+	public UIView viewSelectGameMode;
 	public List<GameObject> queue = new List<GameObject> ();
 	[HideInInspector] public UIView currentView;
 
@@ -26,11 +26,12 @@ public class ViewController : MonoBehaviour {
 	void Start()
 	{
 		viewLoading.Hide();
-		viewWelcome.Hide ();
+		viewLocalMode.Hide ();
 		viewInPlay.Hide ();
-
-		if (debugView != null) ChangeView(debugView);
-		else ChangeView(viewLoading);
+		viewSelectGameMode.Hide ();
+		if (debugView != null)
+			ChangeView(debugView);
+		else ChangeView(viewSelectGameMode);
 
 	}
 
@@ -45,11 +46,9 @@ public class ViewController : MonoBehaviour {
 
 
 	public void ToWelcomeView() {
-//		ChangeView(viewMainMenu);
+
 	}
 
 
-
-	//DO NOT EDIT THIS SCRIPT
 
 }

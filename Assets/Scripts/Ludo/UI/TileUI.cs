@@ -9,6 +9,10 @@ public class TileUI : MonoBehaviour {
 
 		public Image  tileImage;
 
+		void Awake(){
+			tileImage = this.GetComponent<Image> ();
+		}
+
 }
 
 }

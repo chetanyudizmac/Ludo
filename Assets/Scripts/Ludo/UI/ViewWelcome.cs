@@ -6,14 +6,10 @@ namespace Games.Ludo{
 
 	public class ViewWelcome : UIView {
 		public static ViewWelcome instance;
-		public GameObject VsComputerPopUp;
+		public UIPopUpMenu VsComputerPopUp;
 		GameObject currentPopup;
 
-		public Image[] buttonsImage;
 
-		Color[] buttonColors=new Color[] {Color.red, Color.green,Color.blue,Color.yellow};
-		int selectedColor=0;
-		Image currentSelectedButtonImage;
 
 		public override void Awake(){
 			base.Awake ();
@@ -22,8 +18,8 @@ namespace Games.Ludo{
 
 		public override void Show(){
 			base.Show ();
-			VsComputerPopUp.SetActive (false);
-			currentSelectedButtonImage = buttonsImage [0];
+			VsComputerPopUp.Hide(false);
+
 
 		}
 		public override void Hide(){
@@ -37,36 +33,13 @@ namespace Games.Ludo{
 
 		public void VsComputerButtonClicked(){
 			GameManager.instance.currentGameType = GameType.VsComputer;			
-			ChangePopUp(VsComputerPopUp);
-		}
-		public void ChangePopUp(GameObject targetPopUp)
-		{
-			if (currentPopup != null) {
-				currentPopup.SetActive (false);
-				currentPopup = targetPopUp;
-				currentPopup.SetActive (true);
-			} else {
-				currentPopup = targetPopUp;
-				currentPopup.SetActive (true);
-			}
-		}
-		public void SelectColorButtonClick(int buttonNo){
-			currentSelectedButtonImage.color = Color.white;
-			currentSelectedButtonImage = buttonsImage [buttonNo];
-			buttonsImage [buttonNo].color = buttonColors [buttonNo];
-			selectedColor = buttonNo;	
+			PopUpVsComputerMode.instance.Show (true);
+
 		}
 
-		public void PlayButtonClicked(){
-			Board.instance.SetRegions (selectedColor);
-//			Hide ();
-//			ViewInPlay.instance.Show ();
-			ViewController.instance.ChangeView(ViewController.instance.viewInPlay);
-		}
-		public void CloseButtonClicked()
-		{
-			currentPopup.SetActive (false);
-		}
+
+
+
 
 }
 }

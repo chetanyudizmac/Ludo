@@ -27,17 +27,13 @@ public class Board : MonoBehaviour {
 		}
 
 
-
-		public void SetRegions(int colorNumber){
-			Debug.Log (colorNumber);
-			colorNumber = 2;
+		public void SetRegionsForLocal(){
+			int colorNumber = PopUpVsComputerMode.instance.selectedColor;
 			BoardManager.instance.SetCurrentRegion (colorNumber);
 			region1.SetRegionColor ((RegionType)Enum.ToObject (typeof(RegionType), colorNumber % 4));
 			region2.SetRegionColor ((RegionType)Enum.ToObject (typeof(RegionType), (1 + colorNumber) % 4));
 			region3.SetRegionColor ((RegionType)Enum.ToObject (typeof(RegionType), (2 + colorNumber) % 4));
 			region4.SetRegionColor((RegionType)Enum.ToObject(typeof(RegionType) , (3+colorNumber) % 4));		
-		
-
 		}
 
         }

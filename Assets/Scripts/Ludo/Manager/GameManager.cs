@@ -8,7 +8,7 @@ namespace Games.Ludo {
 	public class GameManager : MonoBehaviour {
 
 		public static GameManager instance;
-		public  GameType currentGameType;
+		public  GameType currentGameType=GameType.VsComputer;
 
 		void Awake() {
 			instance = this;
@@ -27,7 +27,8 @@ namespace Games.Ludo {
 		
 
 		public  void StartGame() {
-			
+			BoardManager.instance.PlayMatch ();
+			//Board.instance.SetRegions (selectedColor);	
 		}
 			
 		public  void GameOver() {

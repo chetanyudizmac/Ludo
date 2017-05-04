@@ -16,7 +16,6 @@ public class Board : MonoBehaviour {
 		public Region region4;
 
 
-		public RegionType currentRegionType;
 
 		public void Awake(){
 			instance = this;
@@ -27,14 +26,34 @@ public class Board : MonoBehaviour {
 		}
 
 
-		public void SetRegionsForLocal(){
-			int colorNumber = PopUpVsComputerMode.instance.selectedColor;
-			BoardManager.instance.SetCurrentRegion (colorNumber);
+		public void SetRegionsForVsComputer(int colorNumber){
 			region1.SetRegionColor ((RegionType)Enum.ToObject (typeof(RegionType), colorNumber % 4));
 			region2.SetRegionColor ((RegionType)Enum.ToObject (typeof(RegionType), (1 + colorNumber) % 4));
 			region3.SetRegionColor ((RegionType)Enum.ToObject (typeof(RegionType), (2 + colorNumber) % 4));
 			region4.SetRegionColor((RegionType)Enum.ToObject(typeof(RegionType) , (3+colorNumber) % 4));		
 		}
+
+		public void CreateToken(){
+			region1.CreateToken ();
+			region3.CreateToken ();
+		}
+
+		public void CreateToken(Region region1,Region region3){
+			
+		}
+
+		public void CreateToken(Region region1, Region region2, Region region3){
+		
+		}
+
+		public void CreateToken(Region region1, Region region2, Region region3, Region region4){
+		
+		}
+
+
+
+
+
 
         }
 }

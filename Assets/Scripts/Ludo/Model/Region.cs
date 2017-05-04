@@ -11,7 +11,7 @@ public class Region : MonoBehaviour {
 
 		//specific by time
 		public RegionType regionType;
-
+		public Token token;
 		/// <summary>
 		///  collection of Tile list residing in particular region
 		/// </summary>
@@ -21,6 +21,13 @@ public class Region : MonoBehaviour {
 
 		public Image destinationHome;
 		public Image yard;
+
+		List<Token> tokenList = new List<Token>();
+
+		public List<Transform> tokenPosition = new List<Transform>();
+
+
+		public List<Token> tokenPath = new List<Token>();
 
 		public int GetRemainingToken(){		
 			return 0;
@@ -47,12 +54,31 @@ public class Region : MonoBehaviour {
 					if(tile.isSafePlace)
 					tile.tileUI.tileImage.color = currentColor;
 				}
+
 				destinationHome.color = currentColor;
 				yard.color = currentColor;
 			}
 			else{
 				Debug.Log("Region Color not assigned");
 			}
+		}
+
+
+		public void CreateToken(){
+			
+			foreach(Transform currentPosition in tokenPosition){
+				Token currentToken = Instantiate (token) as Token;
+				currentToken.transform.SetParent (this.transform, false);	
+				currentToken.transform.position = currentPosition.position;
+				currentToken.SetTokenProperty (regionType, currentColor);
+			}
+		}
+
+		public void GetBackToHome(){
+			
+		}
+
+		public void CreateTokenInRegion(){
 		}
 
 	}

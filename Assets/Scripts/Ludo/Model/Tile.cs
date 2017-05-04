@@ -21,5 +21,7 @@ public class Tile : MonoBehaviour {
 		public void Awake(){
 			tileUI = this.GetComponent<TileUI> ();
 		}
+
+
 }
 }

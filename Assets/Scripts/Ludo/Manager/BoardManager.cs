@@ -12,14 +12,10 @@ public class BoardManager : MonoBehaviour {
 			instance = this;
 		}
 
-		public RegionType   currentRegionType;  //current player region 
 		public Region currentPlayerRegion;
+
 		public void Start(){
 			currentPlayerRegion = Board.instance.region1;
-		}
-
-		public void SetCurrentRegion(int colorNumber){
-			currentRegionType = (RegionType)Enum.ToObject(typeof(RegionType) , colorNumber);
 		}
 
 		public void PlayMatch(){
@@ -32,10 +28,13 @@ public class BoardManager : MonoBehaviour {
 		}
 
 		public void StartGameOfTypeVsMachine(){
-			Board.instance.SetRegionsForLocal ();
+			Board.instance.SetRegionsForVsComputer (PopUpVsComputerMode.instance.selectedColor);
+			Board.instance.CreateToken ();
 		}
 
+
 		public void  StartGameOfTypeLocal(){
+			
 		}
 
 }

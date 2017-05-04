@@ -12,10 +12,10 @@ public class BoardManager : MonoBehaviour {
 			instance = this;
 		}
 
-		public Region currentPlayerRegion;
+		//region who have turn to play
+		public Region currentActivatedeRegion;
 
 		public void Start(){
-			currentPlayerRegion = Board.instance.region1;
 		}
 
 		public void PlayMatch(){
@@ -30,6 +30,25 @@ public class BoardManager : MonoBehaviour {
 		public void StartGameOfTypeVsMachine(){
 			Board.instance.SetRegionsForVsComputer (PopUpVsComputerMode.instance.selectedColor);
 			Board.instance.CreateToken ();
+			GameManager.instance.gameStatus = GameStatus.InGameplay;
+			InitiateTurn (Board.instance.region1,Board.instance.region3);
+		}
+
+
+		public void InitiateTurn(Region region1,Region region3){
+			int random = 1.RandomNumber (2);
+			if (random == 1) {
+				currentActivatedeRegion = region1;
+			} else {
+				currentActivatedeRegion = region3;
+			}
+		}
+
+		public void InitiateTurn(Region region1, Region region2,Region region3,Region region4){
+			
+		}
+
+		public void InitiateTurn(Region region1,Region region2, Region region3){
 		}
 
 

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
-using System;
+
 
 
 public static class Extensions {
@@ -61,10 +61,8 @@ public static class Extensions {
 
 
 
-	public static List<DateTime> SortAscending(this List<DateTime> list)
-	{
-		list.Sort((a, b) => a.CompareTo(b));
-		return list;
+	public static int RandomNumber( this int minPoint, int MaxPoint){
+		return Random.Range(minPoint,MaxPoint);
 	}
 
 

@@ -9,7 +9,7 @@ namespace Games.Ludo {
 
 		public static GameManager instance;
 		public  GameType currentGameType=GameType.VsComputer;
-
+		public GameStatus gameStatus = GameStatus.InMenu;
 		void Awake() {
 			instance = this;
 		}
@@ -24,7 +24,7 @@ namespace Games.Ludo {
 				
 			}
 		}
-		
+
 
 		public  void StartGame() {
 			BoardManager.instance.PlayMatch ();

@@ -14,4 +14,6 @@ namespace Games.Ludo{
 
 	public enum GameType{LocalMode,VsComputer};
 
+	public enum GameStatus{InMenu,InGameplay,Paused};
+
 }

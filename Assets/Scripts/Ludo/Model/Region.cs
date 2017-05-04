@@ -27,7 +27,7 @@ public class Region : MonoBehaviour {
 		public List<Transform> tokenPosition = new List<Transform>();
 
 
-		public List<Token> tokenPath = new List<Token>();
+		public List<Tile> tokenPath = new List<Tile>();
 
 		public int GetRemainingToken(){		
 			return 0;

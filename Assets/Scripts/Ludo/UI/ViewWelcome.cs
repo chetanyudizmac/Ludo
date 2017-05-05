@@ -7,6 +7,7 @@ namespace Games.Ludo{
 	public class ViewWelcome : UIView {
 		public static ViewWelcome instance;
 		public UIPopUpMenu VsComputerPopUp;
+		public UIPopUpMenu LocalModePopUp;
 		GameObject currentPopup;
 
 
@@ -19,6 +20,7 @@ namespace Games.Ludo{
 		public override void Show(){
 			base.Show ();
 			VsComputerPopUp.Hide(false);
+			LocalModePopUp.Hide (false);
 
 
 		}
@@ -29,6 +31,7 @@ namespace Games.Ludo{
 
 		public void LocalModeButtonClicked(){
 			GameManager.instance.currentGameType = GameType.LocalMode;
+			PopUpLocalMode.instance.Show (true);
 		}
 
 		public void VsComputerButtonClicked(){

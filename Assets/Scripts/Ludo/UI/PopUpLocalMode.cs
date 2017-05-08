@@ -35,10 +35,10 @@ namespace Games.Ludo{
 		public Text[] fourPlayerTextGroup;
 
 		//Data Which we wants to get
-		RegionType r1Color;
-		RegionType r2Color;
-		RegionType r3Color;
-		RegionType r4Color;
+		public RegionType r1Color;
+		public RegionType r2Color;
+		public RegionType r3Color;
+		public RegionType r4Color;
 
 
 
@@ -273,9 +273,9 @@ namespace Games.Ludo{
 				}
 			}
 
-//			GameManager.instance.StartGame ();
-//			Hide (true);
-//			ViewController.instance.ChangeView(ViewController.instance.viewInPlay);
+			GameManager.instance.StartGame ();
+			Hide (true);
+			ViewController.instance.ChangeView(ViewController.instance.viewInPlay);
 
 		}
 	}

@@ -30,11 +30,11 @@ public class Board : MonoBehaviour {
 			region4.SetRegionColor((RegionType)Enum.ToObject(typeof(RegionType) , (3+colorNumber) % 4));		
 		}
 
-		public void SetRegionsForLocal(int region1Color, int region2Color, int region3Color, int region4Color){
-			region1.SetRegionColor ((RegionType)Enum.ToObject (typeof(RegionType), region1Color % 4));
-			region2.SetRegionColor ((RegionType)Enum.ToObject (typeof(RegionType), (1 + region2Color) % 4));
-			region3.SetRegionColor ((RegionType)Enum.ToObject (typeof(RegionType), (2 + region3Color) % 4));
-			region4.SetRegionColor((RegionType)Enum.ToObject(typeof(RegionType) , (3+region4Color) % 4));	
+		public void SetRegionsForLocal(RegionType region1Color, RegionType region2Color, RegionType region3Color, RegionType region4Color){
+			region1.SetRegionColor (region1Color);
+			region2.SetRegionColor (region2Color);
+			region3.SetRegionColor (region3Color);
+			region4.SetRegionColor(region4Color);	
 		}
 		public void CreateToken(){
 			region1.CreateToken ();
@@ -42,14 +42,23 @@ public class Board : MonoBehaviour {
 		}
 
 		public void CreateToken(Region region1,Region region3){
+			region1.CreateToken ();
+			region3.CreateToken ();
 			
 		}
 
 		public void CreateToken(Region region1, Region region2, Region region3){
-		
+			region1.CreateToken ();
+			region2.CreateToken ();
+			region3.CreateToken ();
+			
 		}
 
 		public void CreateToken(Region region1, Region region2, Region region3, Region region4){
+			region1.CreateToken ();
+			region2.CreateToken ();
+			region3.CreateToken ();
+			region4.CreateToken ();
 		
 		}
 

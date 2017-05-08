@@ -28,7 +28,7 @@ public class BoardManager : MonoBehaviour {
 		public static BoardManager instance;
 
 		LinkedList<Region> activeRegionList = new LinkedList<Region>();
-
+		int random = 0;
 		public void Awake(){
 			instance = this;
 		}
@@ -87,17 +87,38 @@ public class BoardManager : MonoBehaviour {
 			currentActivatedeRegion.Value.RollDice ();	
 		}
 
-		public void  StartGameOfTypeLocal(){
-			
-			
-		}
+
 		public void NextTurnLocalMode(){
-			Debug.Log ("NextTurnLocalMode");
+			currentActivatedeRegion.Value.dice.DisableDice ();
+			currentActivatedeRegion=currentActivatedeRegion.NextOrFirst();
+			currentActivatedeRegion.Value.dice.EnableDice ();
 		}
 
 		#region localMode
 		#endregion
-
+		public void  StartGameOfTypeLocal(){
+			Board.instance.SetRegionsForLocal (PopUpLocalMode.instance.r1Color,PopUpLocalMode.instance.r2Color,PopUpLocalMode.instance.r3Color,PopUpLocalMode.instance.r4Color);
+			GameManager.instance.gameStatus = GameStatus.InGameplay;
+			if (PopUpLocalMode.instance.noOfActivePlayers == 2) {
+				Board.instance.CreateToken (Board.instance.region1,Board.instance.region3);
+				activeRegionList.AddLast (Board.instance.region1);
+				activeRegionList.AddLast (Board.instance.region3);
+			} 
+			else if (PopUpLocalMode.instance.noOfActivePlayers == 3) {
+				Board.instance.CreateToken (Board.instance.region1,Board.instance.region2,Board.instance.region3);
+				activeRegionList.AddLast (Board.instance.region1);
+				activeRegionList.AddLast (Board.instance.region2);
+				activeRegionList.AddLast (Board.instance.region3);
+			} 
+			else {
+				Board.instance.CreateToken (Board.instance.region1,Board.instance.region2,Board.instance.region3,Board.instance.region4);
+				activeRegionList.AddLast (Board.instance.region1);
+				activeRegionList.AddLast (Board.instance.region2);
+				activeRegionList.AddLast (Board.instance.region3);
+				activeRegionList.AddLast (Board.instance.region4);
+			}
+			InitiateTurn (activeRegionList);
+		}
 
 		#region VsComputer integration
 		public void StartGameOfTypeVsComputer(){
@@ -108,15 +129,12 @@ public class BoardManager : MonoBehaviour {
 			activeRegionList.AddLast (Board.instance.region3);
 			InitiateTurn (activeRegionList);
 		}
-
+		/// <summary>
+		/// from no of player it choose which one to initiate the game.
+		/// </summary>
+		/// <param name="regionList">Region list.</param>
 		public void InitiateTurn(LinkedList<Region> regionList){
-			int random = 0.RandomNumber (2);
-			Debug.Log (random);
-			if (random == 1) {
-				currentActivatedeRegion = regionList.First;			   
-			} else {
-				currentActivatedeRegion = regionList.Last;
-			}
+			currentActivatedeRegion = regionList.First;	
 			if (currentActivatedeRegion.Value.dice != null) {
 				currentActivatedeRegion.Value.dice.EnableDice ();
 			} else {

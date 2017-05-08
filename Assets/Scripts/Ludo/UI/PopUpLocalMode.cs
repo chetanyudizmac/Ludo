@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,19 +27,20 @@ namespace Games.Ludo{
 
 		//3P Variables
 		int[] selectedColorInGroup={0,1,3};
-		Color[] selectedColors = { Color.red, Color.green, Color.yellow, Color.blue };
+		Stack<int> forUnSelected=new Stack<int>();
 		public GameObject[] selectColorImagesGroup;
 		public Text[] threePlayerTextGroup;
-
 
 		//4p Variables
 		public Text[] fourPlayerTextGroup;
 
 		//Data Which we wants to get
-		[HideInInspector] Color region1Color;
-		[HideInInspector] Color region2Color;
-		[HideInInspector] Color region3Color;
-		[HideInInspector] Color region4Color;
+		RegionType r1Color;
+		RegionType r2Color;
+		RegionType r3Color;
+		RegionType r4Color;
+
+
 
 		[HideInInspector] string region1PlayerName;
 		[HideInInspector] string region2PlayerName;
@@ -50,16 +52,21 @@ namespace Games.Ludo{
 		public override void Awake (){
 			base.Awake ();
 			instance = this; 
-			region1Color = Color.blue;
-			region2Color = Color.red;
-			region3Color = Color.green;
-			region4Color = Color.yellow;
+	
+
+			r1Color = RegionType.Blue;
+			r2Color = RegionType.Red;
+			r3Color = RegionType.Green;
+			r4Color = RegionType.Yellow;
 
 			region1PlayerName="Player1";
 			region2PlayerName="Player2";
 			region3PlayerName="Player3";
 			region4PlayerName="Player4";
-
+			forUnSelected.Push (0);
+			forUnSelected.Push (1);
+			forUnSelected.Push (2);
+			forUnSelected.Push (3);
 		}
 
 		public override void PopUpAppeared ()
@@ -90,19 +97,21 @@ namespace Games.Ludo{
 		public void GroupAButtonClicked()
 		{
 			selectedGroup = 0;
-			region1Color = Color.blue;
-			region2Color = Color.red;
-			region3Color = Color.green;
-			region4Color = Color.yellow;
+
+			r1Color = RegionType.Blue;
+			r2Color = RegionType.Red;
+			r3Color = RegionType.Green;
+			r4Color = RegionType.Yellow;
 			ChangeGroupColor (groupASelectedImage);
 		}
 		public void GroupBButtonClicked()
 		{
 			selectedGroup = 1;
-			region1Color = Color.yellow;
-			region2Color = Color.green;
-			region3Color = Color.red;
-			region4Color = Color.blue;
+
+			r1Color = RegionType.Yellow;
+			r2Color = RegionType.Green;
+			r3Color = RegionType.Red;
+			r4Color = RegionType.Blue;
 			ChangeGroupColor (groupBSelectedImage);
 		}
 		#endregion
@@ -136,7 +145,19 @@ namespace Games.Ludo{
 			if (!conflictFound) {
 				selectedColorInGroup [groupNo] = selectionNumber;
 			}
+
 			ChangeRightIconOnSelectedButton ();
+		}
+		private int SetRegion4ColorFor3p()
+		{
+			for (int noOfSelected = 0; noOfSelected < selectedColorInGroup.Length; noOfSelected++) {
+				for (int j = 0; j < selectedColorInGroup.Length; j++) {
+					if (selectedColorInGroup [j] == forUnSelected.Peek ()) {
+						forUnSelected.Pop ();
+					}
+				}
+			}
+			return forUnSelected.Pop ();
 		}
 		private void ChangeRightIconOnSelectedButton()
 		{//0 red ,1 green,2 yellow,3 blue
@@ -217,9 +238,12 @@ namespace Games.Ludo{
 					}
 				}
 			} else if (noOfActivePlayers == 3) {
-				region1Color = selectedColors [selectedColorInGroup [0]];
-				region2Color = selectedColors [selectedColorInGroup [1]];
-				region3Color = selectedColors [selectedColorInGroup [2]];
+		
+				r1Color = (RegionType)Enum.ToObject (typeof(RegionType),selectedColorInGroup[0]);
+				r2Color = (RegionType)Enum.ToObject (typeof(RegionType),selectedColorInGroup[1]);
+				r3Color = (RegionType)Enum.ToObject (typeof(RegionType),selectedColorInGroup[2]);
+				r4Color = (RegionType)Enum.ToObject (typeof(RegionType),SetRegion4ColorFor3p ());
+
 				if (threePlayerTextGroup [0].text == "") {
 					region1PlayerName="Player 1";	
 					region2PlayerName="Player 2";	
@@ -231,10 +255,11 @@ namespace Games.Ludo{
 				}
 			} 
 			else {
-				region1Color = Color.blue;
-				region2Color = Color.red;
-				region3Color = Color.green;
-				region4Color = Color.yellow;
+	
+				r1Color = RegionType.Blue;
+				r2Color = RegionType.Red;
+				r3Color = RegionType.Green;
+				r4Color = RegionType.Yellow;
 				if (fourPlayerTextGroup [0].text == "") {
 					region1PlayerName = "Player 1";	
 					region2PlayerName = "Player 2";	
@@ -247,14 +272,10 @@ namespace Games.Ludo{
 					region4PlayerName = fourPlayerTextGroup [3].text;
 				}
 			}
-			Debug.Log (region1Color);
-			Debug.Log (region2Color);
-			Debug.Log (region3Color);
-			Debug.Log (region4Color);
-			Debug.Log (region1PlayerName);
-			Debug.Log (region2PlayerName);
-			Debug.Log (region3PlayerName);
-			Debug.Log (region4PlayerName);
+
+//			GameManager.instance.StartGame ();
+//			Hide (true);
+//			ViewController.instance.ChangeView(ViewController.instance.viewInPlay);
 
 		}
 	}

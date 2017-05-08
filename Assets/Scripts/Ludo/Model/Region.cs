@@ -8,6 +8,8 @@ namespace Games.Ludo{
 
 public class Region : MonoBehaviour {
 
+		public delegate void MakeMoveDelegate();
+		public MakeMoveDelegate  MakeMove;
 
 		//specific by time
 		public RegionType regionType;
@@ -25,9 +27,19 @@ public class Region : MonoBehaviour {
 		List<Token> tokenList = new List<Token>();
 
 		public List<Transform> tokenPosition = new List<Transform>();
-
-
 		public List<Tile> tokenPath = new List<Tile>();
+		public Dice dice;
+
+		public Region(){
+		}
+
+		void OnEnable(){
+		}
+
+		void OnDisable(){
+			MakeMove = null;
+		}
+
 
 		public int GetRemainingToken(){		
 			return 0;
@@ -48,13 +60,12 @@ public class Region : MonoBehaviour {
 		}
 
 		public void FillColorInRegion(){
-			if (currentColor!=null) {
-				foreach (Tile tile in tileList) {
+			if (currentColor!=null){
+				foreach (Tile tile in tileList){
 					tile.RegionType = regionType;
 					if(tile.isSafePlace)
 					tile.tileUI.tileImage.color = currentColor;
 				}
-
 				destinationHome.color = currentColor;
 				yard.color = currentColor;
 			}
@@ -64,14 +75,70 @@ public class Region : MonoBehaviour {
 		}
 
 
-		public void CreateToken(){
-			
+		public void CreateToken(){			
 			foreach(Transform currentPosition in tokenPosition){
 				Token currentToken = Instantiate (token) as Token;
 				currentToken.transform.SetParent (this.transform, false);	
 				currentToken.transform.position = currentPosition.position;
-				currentToken.SetTokenProperty (regionType, currentColor);
+				currentToken.SetTokenProperty (this, currentColor);
+				tokenList.Add (currentToken);
 			}
+		}
+
+		public void RollDice(){
+			StartCoroutine (RollDiceCoroutine());
+		}
+
+		public IEnumerator RollDiceCoroutine(){
+			bool isFinished=false;
+			int number=0;
+			StartCoroutine (dice.DiceAnimation(value=>isFinished=value, value=>number=value));
+			WaitForEndOfFrame endFrame = new WaitForEndOfFrame ();
+			while (!isFinished) {
+				yield return endFrame;
+			}
+			yield return new WaitForSeconds (1);
+			CheckMove (number);
+		}
+
+		public void CheckMove(int number){
+			int numberOfTokenInYard = TokenInYard ();
+			if (numberOfTokenInYard == 4) {
+				if (number != 6) {
+					Debug.Log ("All Players in home. and you havent got 6");
+					EndTurn ();
+				} else {
+					Debug.Log ("gotcha");
+				}
+			}
+		}
+
+		public void MakeMoveLocalMode(){
+			Debug.Log ("localMode Move");
+		}
+
+
+
+		public void MakeMoveVsComputerMode(){			
+			Debug.Log ("ComputerModeMove");
+		}
+	
+		/// <summary>
+		/// number of players in yard
+		/// </summary>
+		/// <returns>The in home.</returns>
+		public int TokenInYard(){
+			int count = 0;
+			foreach (Token token in tokenList) {
+				if (token.inHome) {
+					count++;
+				}
+			}
+			return count;
+		}
+
+		void EndTurn(){
+			BoardManager.instance.NextTurn ();
 		}
 
 		public void GetBackToHome(){

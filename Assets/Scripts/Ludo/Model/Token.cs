@@ -6,19 +6,20 @@ using UnityEngine.UI;
 namespace Games.Ludo{
 public class Token : MonoBehaviour {
 
-		public RegionType regionType;
+		public Region region;
 		public Image image;
-
+		public bool inHome = true;
+		public bool inSafePlace =true;
 		public void Awake(){
 			image = this.GetComponent<Image> ();
 		}
 
-		public void SetColor(Color color){
-			
+		public void SetColor(Color color){			
 		}
 
-		public void SetTokenProperty(RegionType type, Color color){
-			regionType = type;
+
+		public void SetTokenProperty(Region reg, Color color){
+			region = reg;
 			image.color = color;
 		}
 

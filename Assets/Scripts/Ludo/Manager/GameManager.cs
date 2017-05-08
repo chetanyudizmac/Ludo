@@ -16,13 +16,9 @@ namespace Games.Ludo {
 
 
 
-		public  void LoadGame(GameType gameType) {
+		public  void LoadGame() {
 			
-			if (gameType == GameType.LocalMode) {
-				
-			} else if (gameType == GameType.VsComputer) {
-				
-			}
+			BoardManager.instance.SetMode ();
 		}
 
 

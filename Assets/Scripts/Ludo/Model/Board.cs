@@ -26,6 +26,7 @@ public class Board : MonoBehaviour {
 		}
 
 
+
 		public void SetRegionsForVsComputer(int colorNumber){
 			region1.SetRegionColor ((RegionType)Enum.ToObject (typeof(RegionType), colorNumber % 4));
 			region2.SetRegionColor ((RegionType)Enum.ToObject (typeof(RegionType), (1 + colorNumber) % 4));

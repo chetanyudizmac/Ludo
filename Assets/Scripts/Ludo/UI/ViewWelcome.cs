@@ -31,11 +31,15 @@ namespace Games.Ludo{
 
 		public void LocalModeButtonClicked(){
 			GameManager.instance.currentGameType = GameType.LocalMode;
+
 			PopUpLocalMode.instance.Show (true);
+			GameManager.instance.LoadGame ();
+
 		}
 
 		public void VsComputerButtonClicked(){
-			GameManager.instance.currentGameType = GameType.VsComputer;			
+			GameManager.instance.currentGameType = GameType.VsComputer;	
+			GameManager.instance.LoadGame ();
 			PopUpVsComputerMode.instance.Show (true);
 
 		}

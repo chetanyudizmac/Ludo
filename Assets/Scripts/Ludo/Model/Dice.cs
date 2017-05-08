@@ -25,6 +25,8 @@ public class Dice : MonoBehaviour {
 	int randomPoints;
 	public bool isEnabled=false;
 
+	public bool isTesting;
+	public int testingNumber;
 	void Awake()
 	{
 		instance = this;
@@ -49,7 +51,11 @@ public class Dice : MonoBehaviour {
 			
 			isEnabled = false;
 			WaitForSeconds seconds = new WaitForSeconds (spriteChangeSpeed);
-			randomPoints = UnityEngine.Random.Range (1, 7);
+			if (isTesting) {
+				randomPoints = testingNumber;
+			} else {
+				randomPoints = UnityEngine.Random.Range (1, 7);
+			}
 			yield return seconds;
 			iTween.ScaleTo (this.gameObject, scaleDice, scaleSpeed);
 			for (int spriteNo = 0; spriteNo < diceAnimationSprites.Length; spriteNo++) {

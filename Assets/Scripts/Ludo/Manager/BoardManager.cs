@@ -41,9 +41,11 @@ public class BoardManager : MonoBehaviour {
 		}
 
 		public void OnEnable(){
+			Token.MoveToken += MoveToken;
 		}
 
 		public void OnDisable(){
+			Token.MoveToken -= MoveToken;
 			NextTurn = null;
 			StartGame = null;
 		}
@@ -54,16 +56,16 @@ public class BoardManager : MonoBehaviour {
 			StartGame += StartGameOfTypeLocal;
 				Board.instance.region1.MakeMove += Board.instance.region1.MakeMoveLocalMode;
 				Board.instance.region2.MakeMove += Board.instance.region2.MakeMoveLocalMode;
-				Board.instance.region3.MakeMove += Board.instance.region2.MakeMoveLocalMode;
-				Board.instance.region4.MakeMove += Board.instance.region2.MakeMoveLocalMode;
+				Board.instance.region3.MakeMove += Board.instance.region3.MakeMoveLocalMode;
+				Board.instance.region4.MakeMove += Board.instance.region4.MakeMoveLocalMode;
 			}
 			else if(GameManager.instance.currentGameType == GameType.VsComputer){
 				NextTurn += NextTurnVsComputerMode;
 				StartGame +=StartGameOfTypeVsComputer;
 				Board.instance.region1.MakeMove += Board.instance.region1.MakeMoveVsComputerMode;
 				Board.instance.region2.MakeMove += Board.instance.region2.MakeMoveVsComputerMode;
-				Board.instance.region3.MakeMove += Board.instance.region2.MakeMoveVsComputerMode;
-				Board.instance.region4 .MakeMove+= Board.instance.region2.MakeMoveVsComputerMode;
+				Board.instance.region3.MakeMove += Board.instance.region3.MakeMoveVsComputerMode;
+				Board.instance.region4 .MakeMove+= Board.instance.region4.MakeMoveVsComputerMode;
 			}
 		}
 
@@ -87,13 +89,17 @@ public class BoardManager : MonoBehaviour {
 
 		public void  StartGameOfTypeLocal(){
 			
+			
 		}
 		public void NextTurnLocalMode(){
 			Debug.Log ("NextTurnLocalMode");
 		}
 
-		#region VsComputer integration
+		#region localMode
+		#endregion
 
+
+		#region VsComputer integration
 		public void StartGameOfTypeVsComputer(){
 			Board.instance.SetRegionsForVsComputer (PopUpVsComputerMode.instance.selectedColor);
 			Board.instance.CreateToken ();
@@ -125,7 +131,14 @@ public class BoardManager : MonoBehaviour {
 		}
 		#endregion
 
-
+		public void MoveToken(Token token){
+			if (token.isActivated) {
+				Debug.Log (token.region.name);
+				token.region.MakeMove (token);
+			} else {
+				
+			}
+		}
 
 
 }

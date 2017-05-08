@@ -8,7 +8,7 @@ namespace Games.Ludo{
 
 public class Region : MonoBehaviour {
 
-		public delegate void MakeMoveDelegate();
+		public delegate void MakeMoveDelegate(Token token);
 		public MakeMoveDelegate  MakeMove;
 
 		//specific by time
@@ -109,17 +109,40 @@ public class Region : MonoBehaviour {
 					EndTurn ();
 				} else {
 					Debug.Log ("gotcha");
+					ActivateAllToken ();
 				}
 			}
 		}
 
-		public void MakeMoveLocalMode(){
+
+		public void ActivateAllToken(){
+			foreach (Token token in tokenList) {
+				token.ActivateToken ();
+			}
+		}
+
+		public void DeactivateAllToken(){
+			foreach (Token token in tokenList) {
+				token.DeActivateToken ();
+			}
+		}
+
+
+		public void MakeMoveLocalMode(Token token){
+			if (token.inHome) {
+
+				token.DriveToken (token.GetComponent<RectTransform>(),tokenPath[0].GetComponent<RectTransform>());
+			}
 			Debug.Log ("localMode Move");
 		}
 
 
-
-		public void MakeMoveVsComputerMode(){			
+		public void MakeMoveVsComputerMode(Token token){	
+			if (token.inHome) {	
+				Debug.Log (this.gameObject.name);
+				Debug.Log (tokenPath[0].gameObject.name);
+				token.DriveToken (yard.rectTransform,tokenPath[0].GetComponent<RectTransform>());
+			}
 			Debug.Log ("ComputerModeMove");
 		}
 	
@@ -138,6 +161,7 @@ public class Region : MonoBehaviour {
 		}
 
 		void EndTurn(){
+			DeactivateAllToken ();
 			BoardManager.instance.NextTurn ();
 		}
 

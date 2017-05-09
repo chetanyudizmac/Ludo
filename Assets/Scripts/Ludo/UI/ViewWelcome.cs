@@ -31,7 +31,6 @@ namespace Games.Ludo{
 
 		public void LocalModeButtonClicked(){
 			GameManager.instance.currentGameType = GameType.LocalMode;
-
 			PopUpLocalMode.instance.Show (true);
 			GameManager.instance.LoadGame ();
 

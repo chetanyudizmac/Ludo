@@ -22,7 +22,8 @@ public class Dice : MonoBehaviour {
 	//how fast sprite should change 
 	public float spriteChangeSpeed=0.1f;
 	//random numbers
-	int randomPoints;
+	[HideInInspector]
+	public int DiceNumber;
 	public bool isEnabled=false;
 
 	public bool isTesting;
@@ -52,9 +53,9 @@ public class Dice : MonoBehaviour {
 			isEnabled = false;
 			WaitForSeconds seconds = new WaitForSeconds (spriteChangeSpeed);
 			if (isTesting) {
-				randomPoints = testingNumber;
+				DiceNumber = testingNumber;
 			} else {
-				randomPoints = UnityEngine.Random.Range (1, 7);
+				DiceNumber = UnityEngine.Random.Range (1, 7);
 			}
 			yield return seconds;
 			iTween.ScaleTo (this.gameObject, scaleDice, scaleSpeed);
@@ -67,9 +68,9 @@ public class Dice : MonoBehaviour {
 				diceImage.sprite = diceAnimationSprites [spriteNo];
 				yield return seconds;
 			}
-			diceImage.sprite = diceSprites [randomPoints-1];
+			diceImage.sprite = diceSprites [DiceNumber-1];
 			isFinished (true);
-			number (randomPoints);
+			number (DiceNumber);
 			yield return null;
 		}
 	}

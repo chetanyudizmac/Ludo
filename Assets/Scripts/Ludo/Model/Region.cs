@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 namespace Games.Ludo{
 
@@ -10,7 +9,6 @@ public class Region : MonoBehaviour {
 
 		public delegate void MakeMoveDelegate(Token token);
 		public MakeMoveDelegate  MakeMove;
-
 		//specific by time
 		public RegionType regionType;
 		public Token token;
@@ -18,17 +16,16 @@ public class Region : MonoBehaviour {
 		///  collection of Tile list residing in particular region
 		/// </summary>
 		public List<Tile> tileList;
-
 		Color currentColor;
-
 		public Image destinationHome;
 		public Image yard;
-
 		List<Token> tokenList = new List<Token>();
-
 		public List<Transform> tokenPosition = new List<Transform>();
 		public List<Tile> tokenPath = new List<Tile>();
+
 		public Dice dice;
+
+		bool isAnyTokenMoving = false; //prevents more than 1 token at single time
 
 		public Region(){
 		}
@@ -78,7 +75,7 @@ public class Region : MonoBehaviour {
 		public void CreateToken(){			
 			foreach(Transform currentPosition in tokenPosition){
 				Token currentToken = Instantiate (token) as Token;
-				currentToken.transform.SetParent (this.transform, false);	
+				currentToken.transform.SetParent (Board.instance.transform, false);	
 				currentToken.transform.position = currentPosition.position;
 				currentToken.SetTokenProperty (this, currentColor);
 				tokenList.Add (currentToken);
@@ -98,52 +95,65 @@ public class Region : MonoBehaviour {
 				yield return endFrame;
 			}
 			yield return new WaitForSeconds (1);
-			CheckMove (number);
+			ActivateMovableToken (number);
 		}
 
-		public void CheckMove(int number){
+	
+		public void ActivateMovableToken(int number){
 			int numberOfTokenInYard = TokenInYard ();
-			if (numberOfTokenInYard == 4) {
+			if (numberOfTokenInYard == 4) {   //check if all token in home
 				if (number != 6) {
 					Debug.Log ("All Players in home. and you havent got 6");
 					EndTurn ();
 				} else {
 					Debug.Log ("gotcha");
-					ActivateAllToken ();
+					foreach (Token token in tokenList) {
+						token.ActivateToken ();
+					}
+				}
+			}
+			else {  
+				foreach (Token token in tokenList) {
+					if (number == 6) {    // if number is 6 and there are  tokens in home
+						token.ActivateToken ();
+					} else {
+						if ((token.pathIndex + number) < tokenPath.Count && !token.inHome)
+							token.ActivateToken ();
+					}
 				}
 			}
 		}
 
-
-		public void ActivateAllToken(){
-			foreach (Token token in tokenList) {
-				token.ActivateToken ();
-			}
-		}
-
-		public void DeactivateAllToken(){
+		public void DeactivateRegion(){
+			
 			foreach (Token token in tokenList) {
 				token.DeActivateToken ();
 			}
 		}
 
 
-		public void MakeMoveLocalMode(Token token){
-			if (token.inHome) {
 
-				token.DriveToken (token.GetComponent<RectTransform>(),tokenPath[0].GetComponent<RectTransform>());
+
+		public void MakeMoveLocalMode(Token token){
+			if (isAnyTokenMoving)
+				return;
+			isAnyTokenMoving = true;
+			if (token.inHome) {	
+				token.inHome = false;
+				token.DriveToken (token.GetComponent<RectTransform> (), tokenPath [0].GetComponent<RectTransform> ());
 			}
-			Debug.Log ("localMode Move");
+			else {
+				List<RectTransform> path = new List<RectTransform> (); 
+				for(int count=1;count<=dice.DiceNumber;count++){
+					path.Add (tokenPath[token.pathIndex+count].GetComponent<RectTransform>());
+				}
+				token.DriveToken (token.GetComponent<RectTransform> (), path);
+
+			}
 		}
 
 
 		public void MakeMoveVsComputerMode(Token token){	
-			if (token.inHome) {	
-				Debug.Log (this.gameObject.name);
-				Debug.Log (tokenPath[0].gameObject.name);
-				token.DriveToken (yard.rectTransform,tokenPath[0].GetComponent<RectTransform>());
-			}
-			Debug.Log ("ComputerModeMove");
 		}
 	
 		/// <summary>
@@ -160,9 +170,15 @@ public class Region : MonoBehaviour {
 			return count;
 		}
 
-		void EndTurn(){
-			DeactivateAllToken ();
-			BoardManager.instance.NextTurn ();
+		public 	void EndTurn(){	
+			isAnyTokenMoving = false;
+			DeactivateRegion ();
+			if (dice.DiceNumber == 6) {
+				dice.EnableDice ();
+			}
+			else {
+				BoardManager.instance.NextTurn ();
+			}
 		}
 
 		public void GetBackToHome(){
@@ -171,6 +187,8 @@ public class Region : MonoBehaviour {
 
 		public void CreateTokenInRegion(){
 		}
+
+
 
 	}
 

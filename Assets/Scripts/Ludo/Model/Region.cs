@@ -20,13 +20,12 @@ public class Region : MonoBehaviour {
 		public Image destinationHome;
 		public Image yard;
 		List<Token> tokenList = new List<Token>();
-		public List<Transform> tokenPosition = new List<Transform>();
+		public List<RectTransform> tokenPosition = new List<RectTransform>();
 		public List<Tile> tokenPath = new List<Tile>();
 
 		public Dice dice;
 
-		bool isAnyTokenMoving = false; //prevents more than 1 token at single time
-
+		Token activatedToken;   //prevents more than 1 token at single time
 		public Region(){
 		}
 
@@ -73,10 +72,12 @@ public class Region : MonoBehaviour {
 
 
 		public void CreateToken(){			
-			foreach(Transform currentPosition in tokenPosition){
-				Token currentToken = Instantiate (token) as Token;
+			
+				for(int count=0; count<tokenPosition.Count;count++){
+				Token currentToken = Instantiate (token,tokenPosition[count].position,Quaternion.identity) as Token;
 				currentToken.transform.SetParent (Board.instance.transform, false);	
-				currentToken.transform.position = currentPosition.position;
+				currentToken.transform.position = tokenPosition[count].position;
+				currentToken.basePosition = tokenPosition[count];
 				currentToken.SetTokenProperty (this, currentColor);
 				tokenList.Add (currentToken);
 			}
@@ -94,7 +95,7 @@ public class Region : MonoBehaviour {
 			while (!isFinished) {
 				yield return endFrame;
 			}
-			yield return new WaitForSeconds (1);
+			yield return new WaitForSeconds (.5f);
 			ActivateMovableToken (number);
 		}
 
@@ -124,36 +125,53 @@ public class Region : MonoBehaviour {
 			}
 		}
 
-		public void DeactivateRegion(){
-			
+		public void DeactivateRegion(){			
 			foreach (Token token in tokenList) {
 				token.DeActivateToken ();
 			}
 		}
 
-
-
-
 		public void MakeMoveLocalMode(Token token){
-			if (isAnyTokenMoving)
+			List<Tile> path = new List<Tile> (); 
+			if (activatedToken!=null)
 				return;
-			isAnyTokenMoving = true;
+			activatedToken = token;
 			if (token.inHome) {	
 				token.inHome = false;
-				token.DriveToken (token.GetComponent<RectTransform> (), tokenPath [0].GetComponent<RectTransform> ());
+				path.Add (tokenPath [0]);
+				StartCoroutine(MoveToken(path));
 			}
-			else {
-				List<RectTransform> path = new List<RectTransform> (); 
+			else {				
 				for(int count=1;count<=dice.DiceNumber;count++){
-					path.Add (tokenPath[token.pathIndex+count].GetComponent<RectTransform>());
+					path.Add (tokenPath[token.pathIndex+count]);
 				}
-				token.DriveToken (token.GetComponent<RectTransform> (), path);
-
+				StartCoroutine(MoveToken(path));
 			}
 		}
 
+		public IEnumerator MoveToken(List<Tile> tokenPath){	
+			
+			if(activatedToken.residingTile!=null)
+			activatedToken.residingTile.RemoveTokenInTile (activatedToken);
+			bool isFinished ;
+			WaitForEndOfFrame frame = new WaitForEndOfFrame ();
+			foreach (Tile tile in tokenPath) {
+				isFinished = false;
+				StartCoroutine(activatedToken.DriveToken(tile.tileUI.rectTransform,1,value=>isFinished=value));
+				while (!isFinished) {
+					yield return frame;
+				}
+			}
+			activatedToken.residingTile = tokenPath [tokenPath.Count - 1];
+			tokenPath [tokenPath.Count - 1].SetTokenInTile(activatedToken);
+			EndTurn ();
+		}
 
-		public void MakeMoveVsComputerMode(Token token){	
+
+
+
+		public void MakeMoveVsComputerMode(Token token){
+			
 		}
 	
 		/// <summary>
@@ -170,15 +188,55 @@ public class Region : MonoBehaviour {
 			return count;
 		}
 
-		public 	void EndTurn(){	
-			isAnyTokenMoving = false;
+		public void EndTurn(){			
 			DeactivateRegion ();
+			if(activatedToken!=null)
+			if(!activatedToken.inHome)
+			if (activatedToken.residingTile != null) {
+				if (activatedToken.residingTile.tokenInTile.Count>1) {
+					Token tokenToRemove = activatedToken.residingTile.TokenToKill (activatedToken);
+
+					if (tokenToRemove != null) {
+						Debug.Log ("kill");
+						StartCoroutine (DriveTokenToHome(tokenToRemove));
+					} else {
+						Debug.Log ("same region available");
+					}
+				}
+			}
+			activatedToken = null;
 			if (dice.DiceNumber == 6) {
 				dice.EnableDice ();
 			}
 			else {
 				BoardManager.instance.NextTurn ();
 			}
+		}
+
+		IEnumerator DriveTokenToHome(Token token){
+				WaitForEndOfFrame frame = new WaitForEndOfFrame ();
+				bool isFinished=false;
+			List<Tile> tokenList = new List<Tile> ();
+			int index = token.region.tokenPath.IndexOf (activatedToken.residingTile);  //token which was caught by current region
+			for (int count = index; count >= 0; count--) {
+				Debug.Log ("returning:"+index);
+					tokenList.Add (tokenPath[index]);
+		    }
+			foreach (Tile tile in tokenList) {
+				StartCoroutine (token.DriveToken (tile.tileUI.rectTransform, -1, value => isFinished = value));
+			}
+			while (!isFinished) {
+					yield return frame;
+			}
+			isFinished = false;
+			StartCoroutine (token.DriveToken (token.basePosition,-1, value => isFinished = value));
+			while (!isFinished) {
+				yield return frame;
+			}
+			token.inHome = true;
+			token.inSafePlace = true;
+			// first position to yard
+			yield return null;
 		}
 
 		public void GetBackToHome(){

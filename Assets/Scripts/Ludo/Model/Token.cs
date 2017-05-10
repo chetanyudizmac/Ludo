@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,20 +10,21 @@ public class Token : MonoBehaviour {
 		public delegate void MoveTokenDelegate(Token token);
 		public static event MoveTokenDelegate MoveToken;
 
-		public delegate void EndTurnDelegate(Token token);
-		public static event EndTurnDelegate EndTurn;
-
 		public Region region;
 		public Image image;
 		public bool inHome = true;
 		public bool inSafePlace =true;
 		public bool isActivated;
-
+		[HideInInspector]
+		public RectTransform basePosition;
 		public int pathIndex=-1;
 		RectTransform  rectTransform;
 		public float movementSpeed=.5f;
+		[HideInInspector]
+		public Tile residingTile; // represent tile which contains the token
 
-		public void Awake(){
+
+		public void Awake(){			
 			rectTransform = this.GetComponent<RectTransform> ();
 			image = this.GetComponent<Image> ();
 		}
@@ -30,6 +32,7 @@ public class Token : MonoBehaviour {
 		public void SetColor(Color color){			
 		
 		}
+
 
 		public void SetTokenProperty(Region reg, Color color){
 			region = reg;
@@ -40,8 +43,9 @@ public class Token : MonoBehaviour {
 			MoveToken (this);
 		}
 
+
+
 		public void ActivateToken(){
-			Debug.Log ("sdfsd");
 			isActivated = true;
 			//iTween.PunchScale(this.gameObject, iTween.Hash("amount", new Vector3(0.2f, 0.2f, 1f), "time", 1f, "looptype", iTween.LoopType.pingPong));
 		}
@@ -52,49 +56,26 @@ public class Token : MonoBehaviour {
 		}
 
 
-		public void DriveToken(RectTransform origin, RectTransform destination){
 
-			pathIndex = 0;
+		/// <summary>
+		/// Drives the token.
+		/// </summary>
+		/// <returns>The token.</returns>
+		/// <param name="destinationRectTransform">Destination  rect transform.</param>
+		/// <param name="index">Set Index for current token.</param>
+		/// <param name="isFinished">Is finished.</param>
+		public IEnumerator DriveToken(RectTransform destinationRectTransform,int index,Action<bool> isFinished){
+			RectTransform originPlace = GetComponent<RectTransform> ();
 			iTween.ValueTo(this.gameObject, iTween.Hash(
-				"from",origin.anchoredPosition,
-				"to", destination.anchoredPosition,
+				"from",originPlace.anchoredPosition,
+				"to", destinationRectTransform.anchoredPosition,
 				"time", movementSpeed,
 				"onupdatetarget", this.gameObject, 
-				"onupdate", "MoveGuiElement",
-			    "oncomplete","CompleteMove"
+				"onupdate", "MoveGuiElement"
 			));
-		 }
-
-		public void DriveTokenSequence(RectTransform origin, RectTransform destination){
-				iTween.ValueTo(this.gameObject, iTween.Hash(
-					"from",origin.anchoredPosition,
-					"to", destination.anchoredPosition,
-					"time", movementSpeed,
-					"onupdatetarget", this.gameObject, 
-					"onupdate", "MoveGuiElement"
-				));
-		
-		}
-
-
-		public void CompleteMove(){
-			EndTurn (this);
-		}
-
-		public void DriveToken(RectTransform origin, List<RectTransform> destination){
-			StartCoroutine (MoveTokenInPath (origin,destination));
-		}
-
-		IEnumerator MoveTokenInPath(RectTransform origin, List<RectTransform> destination){
-			WaitForSeconds waitSeconds = new WaitForSeconds (movementSpeed);
-			DriveTokenSequence (origin,destination[0]);
-			yield return waitSeconds;
-			for (int count = 0; count < destination.Count-1; count++) {
-				DriveTokenSequence (destination [count], destination [count + 1]);
-				yield return waitSeconds;
-			}
-			pathIndex += destination.Count;
-			CompleteMove ();
+			pathIndex += index;
+			yield return new WaitForSeconds (movementSpeed);
+			isFinished (true);
 		}
 
 

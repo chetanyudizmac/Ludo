@@ -30,6 +30,7 @@ public class BoardManager : MonoBehaviour {
 		LinkedList<Region> activeRegionList = new LinkedList<Region>();
 		int random = 0;
 
+
 		public void Awake(){
 			instance = this;
 		}
@@ -43,7 +44,6 @@ public class BoardManager : MonoBehaviour {
 
 		public void OnEnable(){
 			Token.MoveToken += MoveToken;
-			Token.EndTurn += EndTurn;
 		}
 
 		public void OnDisable(){

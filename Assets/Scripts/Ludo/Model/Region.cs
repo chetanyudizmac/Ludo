@@ -214,22 +214,24 @@ public class Region : MonoBehaviour {
 		}
 
 		IEnumerator DriveTokenToHome(Token token){
+			Debug.Log ( "A:"+token.residingTile.gameObject.name+":B"+token.region.name);
 				WaitForEndOfFrame frame = new WaitForEndOfFrame ();
 				bool isFinished=false;
 			List<Tile> tokenList = new List<Tile> ();
-			int index = token.region.tokenPath.IndexOf (activatedToken.residingTile);  //token which was caught by current region
+			int index = token.region.tokenPath.IndexOf (token.residingTile);  //token which was caught by current region
 			for (int count = index; count >= 0; count--) {
-				Debug.Log ("returning:"+index);
-					tokenList.Add (tokenPath[index]);
+				tokenList.Add (token.region.tokenPath[count]);
 		    }
 			foreach (Tile tile in tokenList) {
-				StartCoroutine (token.DriveToken (tile.tileUI.rectTransform, -1, value => isFinished = value));
-			}
-			while (!isFinished) {
+				isFinished = false;
+				StartCoroutine (token.DriveToken (tile.tileUI.rectTransform, -1, value => isFinished = value,.1f));
+				while (!isFinished) {
 					yield return frame;
+				}
 			}
+
 			isFinished = false;
-			StartCoroutine (token.DriveToken (token.basePosition,-1, value => isFinished = value));
+			StartCoroutine (token.DriveToken (token.basePosition,-1, value => isFinished = value,.1f));
 			while (!isFinished) {
 				yield return frame;
 			}

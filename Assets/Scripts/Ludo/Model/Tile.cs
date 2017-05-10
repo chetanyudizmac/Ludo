@@ -41,6 +41,7 @@ public class Tile : MonoBehaviour {
 				if(token!=activatedToken)
 				if (token.region.regionType != activatedToken.region.regionType) {
 					tokenToRemove = token;
+					Debug.Log ("sdfsdfs");
 					break;
 				}
 			}

@@ -19,7 +19,7 @@ public class Token : MonoBehaviour {
 		public RectTransform basePosition;
 		public int pathIndex=-1;
 		RectTransform  rectTransform;
-		public float movementSpeed=.5f;
+		public float timeToReachDestination=.5f;
 		[HideInInspector]
 		public Tile residingTile; // represent tile which contains the token
 
@@ -64,17 +64,17 @@ public class Token : MonoBehaviour {
 		/// <param name="destinationRectTransform">Destination  rect transform.</param>
 		/// <param name="index">Set Index for current token.</param>
 		/// <param name="isFinished">Is finished.</param>
-		public IEnumerator DriveToken(RectTransform destinationRectTransform,int index,Action<bool> isFinished){
+		public IEnumerator DriveToken(RectTransform destinationRectTransform,int index,Action<bool> isFinished,float moveBackOffset=1){
 			RectTransform originPlace = GetComponent<RectTransform> ();
 			iTween.ValueTo(this.gameObject, iTween.Hash(
 				"from",originPlace.anchoredPosition,
 				"to", destinationRectTransform.anchoredPosition,
-				"time", movementSpeed,
+				"time", timeToReachDestination*moveBackOffset,
 				"onupdatetarget", this.gameObject, 
 				"onupdate", "MoveGuiElement"
 			));
 			pathIndex += index;
-			yield return new WaitForSeconds (movementSpeed);
+			yield return new WaitForSeconds (timeToReachDestination*moveBackOffset);
 			isFinished (true);
 		}
 

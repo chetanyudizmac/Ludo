@@ -10,7 +10,7 @@ public class Tile : MonoBehaviour {
 		public TileUI tileUI;
 		public int tileNumber;
 		private RegionType _regionType;
-
+		public bool isDestination;
 		public RegionType RegionType{
 			get{ return _regionType;}
 			set{ _regionType = value;}
@@ -41,7 +41,6 @@ public class Tile : MonoBehaviour {
 				if(token!=activatedToken)
 				if (token.region.regionType != activatedToken.region.regionType) {
 					tokenToRemove = token;
-					Debug.Log ("sdfsdfs");
 					break;
 				}
 			}

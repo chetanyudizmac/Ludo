@@ -43,6 +43,10 @@ public class Token : MonoBehaviour {
 			MoveToken (this);
 		}
 
+		public void AutomatedTokenClicked(Token t)
+		{
+			MoveToken (t);
+		}
 
 
 		public void ActivateToken(){

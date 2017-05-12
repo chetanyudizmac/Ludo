@@ -39,6 +39,7 @@ public class Board : MonoBehaviour {
 		public void CreateToken(){
 			region1.CreateToken ();
 			region3.CreateToken ();
+			region3.isAI = true;
 		}
 
 		public void CreateToken(Region region1,Region region3){

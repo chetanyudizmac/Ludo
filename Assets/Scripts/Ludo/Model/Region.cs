@@ -9,6 +9,9 @@ public class Region : MonoBehaviour {
 
 		public delegate void MakeMoveDelegate(Token token);
 		public MakeMoveDelegate  MakeMove;
+
+		public delegate void RegionActivated();
+		public RegionActivated OnRegionActivated;
 		//specific by time
 		public RegionType regionType;
 		public Token token;
@@ -19,24 +22,34 @@ public class Region : MonoBehaviour {
 		Color currentColor;
 		public Image destinationHome;
 		public Image yard;
-		List<Token> tokenList = new List<Token>();
+		protected List<Token> tokenList = new List<Token>();
 		public List<RectTransform> tokenPosition = new List<RectTransform>();
 		public List<Tile> tokenPath = new List<Tile>();
 
 		public Dice dice;
-
+		public bool isAI;
+		public bool isKilled;
+		public bool isInYard;
+		public bool isAnyTokenIsActivated;
 		Token activatedToken;   //prevents more than 1 token at single time
 		public Region(){
 		}
 
 		void OnEnable(){
+			OnRegionActivated += CheckIsAI;
 		}
 
 		void OnDisable(){
 			MakeMove = null;
+			OnRegionActivated = null;
 		}
 
-
+		public void CheckIsAI()
+		{
+			if (isAI) {
+				RollDice ();
+			}
+		}
 		public int GetRemainingToken(){		
 			return 0;
 		}
@@ -69,8 +82,6 @@ public class Region : MonoBehaviour {
 				Debug.Log("Region Color not assigned");
 			}
 		}
-
-
 		public void CreateToken(){			
 			
 				for(int count=0; count<tokenPosition.Count;count++){
@@ -86,7 +97,6 @@ public class Region : MonoBehaviour {
 		public void RollDice(){
 			StartCoroutine (RollDiceCoroutine());
 		}
-
 		public IEnumerator RollDiceCoroutine(){
 			bool isFinished=false;
 			int number=0;
@@ -98,8 +108,6 @@ public class Region : MonoBehaviour {
 			yield return new WaitForSeconds (.5f);
 			ActivateMovableToken (number);
 		}
-
-	
 		public void ActivateMovableToken(int number){
 			int numberOfTokenInYard = TokenInYard ();
 			if (numberOfTokenInYard == 4) {   //check if all token in home
@@ -115,13 +123,35 @@ public class Region : MonoBehaviour {
 			}
 			else {  
 				foreach (Token token in tokenList) {
-					if (number == 6) {    // if number is 6 and there are  tokens in home
-						token.ActivateToken ();
+					if (number == 6) {
+						if (token.inHome) 
+							token.ActivateToken ();
+						
+						if ((token.pathIndex + number) < tokenPath.Count+1 && !token.inHome) 
+							token.ActivateToken ();	
+						
+						
 					} else {
-						if ((token.pathIndex + number) < tokenPath.Count && !token.inHome)
+						if ((token.pathIndex + number) < tokenPath.Count+1 && !token.inHome)
 							token.ActivateToken ();
 					}
 				}
+			}
+			List<Token> tokenToMove = new List<Token>();
+			int noOfTokenInDestinaion = 0;
+			NoOfActivatedToken (ref tokenToMove,ref noOfTokenInDestinaion);
+			Debug.Log (noOfTokenInDestinaion);
+			if (noOfTokenInDestinaion == 4) {
+				Debug.Log ("Win");
+			}
+			if (tokenToMove.Count == 1) {
+				tokenToMove [0].AutomatedTokenClicked (tokenToMove [0]);
+			} else if (isAI && tokenToMove.Count != 0) {
+				int no = Random.Range (0, tokenToMove.Count);
+				tokenToMove [no].AutomatedTokenClicked (tokenToMove [no]);
+			}
+			if (!isAnyTokenIsActivated) {
+				EndTurn ();
 			}
 		}
 
@@ -166,12 +196,46 @@ public class Region : MonoBehaviour {
 			tokenPath [tokenPath.Count - 1].SetTokenInTile(activatedToken);
 			EndTurn ();
 		}
-
+		/// <summary>
+		/// Returns no of activated token
+		/// </summary>
+		/// <returns>The of activated token.</returns>
+		public bool NoOfActivatedToken(ref List<Token> tokenToMove,ref int noOfActivatedToken)
+		{
+			int count=0;
+			isAnyTokenIsActivated = false;
+			foreach (Token token in tokenList) {
+				if (token.isActivated) {
+					tokenToMove.Add (token);
+					isAnyTokenIsActivated = true;
+				}
+				if(token.residingTile!=null)
+				if (token.residingTile.isDestination) {
+					count++;
+				}
+			}
+			noOfActivatedToken = count;
+			return isAnyTokenIsActivated;
+		}
 
 
 
 		public void MakeMoveVsComputerMode(Token token){
-			
+			List<Tile> path = new List<Tile> (); 
+			if (activatedToken!=null)
+				return;
+			activatedToken = token;
+			if (token.inHome) {	
+				token.inHome = false;
+				path.Add (tokenPath [0]);
+				StartCoroutine(MoveToken(path));
+			}
+			else {				
+				for(int count=1;count<=dice.DiceNumber;count++){
+					path.Add (token.region.tokenPath[token.pathIndex+count]);
+				}
+				StartCoroutine(MoveToken(path));
+			}
 		}
 	
 		/// <summary>
@@ -199,14 +263,23 @@ public class Region : MonoBehaviour {
 					if (tokenToRemove != null) {
 						Debug.Log ("kill");
 						StartCoroutine (DriveTokenToHome(tokenToRemove));
+						isKilled = true;
+						tokenToRemove.residingTile.RemoveTokenInTile (tokenToRemove);
 					} else {
 						Debug.Log ("same region available");
 					}
 				}
 			}
 			activatedToken = null;
-			if (dice.DiceNumber == 6) {
+			if (dice.DiceNumber == 6||isKilled||isInYard) {
+				isKilled = false;
+				isInYard = false;
+				if (!isAnyTokenIsActivated) {
+					BoardManager.instance.NextTurn ();
+					return;
+				}
 				dice.EnableDice ();
+				OnRegionActivated ();
 			}
 			else {
 				BoardManager.instance.NextTurn ();
@@ -237,6 +310,8 @@ public class Region : MonoBehaviour {
 			}
 			token.inHome = true;
 			token.inSafePlace = true;
+			token.residingTile = null;//irfan
+
 			// first position to yard
 			yield return null;
 		}

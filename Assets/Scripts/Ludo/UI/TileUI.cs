@@ -13,7 +13,5 @@ public class TileUI : MonoBehaviour {
 			rectTransform = this.GetComponent<RectTransform> ();
 			tileImage = this.GetComponent<Image> ();
 		}
-
-}
-
+	}
 }

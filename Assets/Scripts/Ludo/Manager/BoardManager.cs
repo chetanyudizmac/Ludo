@@ -67,7 +67,7 @@ public class BoardManager : MonoBehaviour {
 				Board.instance.region1.MakeMove += Board.instance.region1.MakeMoveVsComputerMode;
 				Board.instance.region2.MakeMove += Board.instance.region2.MakeMoveVsComputerMode;
 				Board.instance.region3.MakeMove += Board.instance.region3.MakeMoveVsComputerMode;
-				Board.instance.region4 .MakeMove+= Board.instance.region4.MakeMoveVsComputerMode;
+				Board.instance.region4.MakeMove += Board.instance.region4.MakeMoveVsComputerMode;
 			}
 		}
 
@@ -75,9 +75,6 @@ public class BoardManager : MonoBehaviour {
 		public void PlayMatch(){
 			StartGame ();
 		}
-
-
-
 
 		public void InitiateTurn(Region region1, Region region2,Region region3,Region region4){			
 		}
@@ -143,11 +140,11 @@ public class BoardManager : MonoBehaviour {
 				Debug.Log ("null");
 			}
 		}
-
 		public void NextTurnVsComputerMode(){
 			currentActivatedeRegion.Value.dice.DisableDice ();
 			currentActivatedeRegion=currentActivatedeRegion.NextOrFirst();
 			currentActivatedeRegion.Value.dice.EnableDice ();
+			currentActivatedeRegion.Value.OnRegionActivated ();
 		}
 		#endregion
 
@@ -158,11 +155,8 @@ public class BoardManager : MonoBehaviour {
 				
 			}
 		}
-
 		public void EndTurn(Token token){
 			token.region.EndTurn ();
 		}
-
-
-}
+	}
 }

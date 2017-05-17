@@ -12,13 +12,17 @@ public class Token : MonoBehaviour {
 
 		public Region region;
 		public Image image;
-		public bool inHome = true;
+		public bool inYard = true;
+		public bool inHome = false;
 		public bool inSafePlace =true;
 		public bool isActivated;
 		[HideInInspector]
 		public RectTransform basePosition;
-		public int pathIndex=-1;
-		RectTransform  rectTransform;
+		public int pathIndex=50;
+		[HideInInspector]
+		public RectTransform  rectTransform;
+		[HideInInspector]
+		public Vector2 defaultSize;
 		public float timeToReachDestination=.5f;
 		[HideInInspector]
 		public Tile residingTile; // represent tile which contains the token
@@ -26,6 +30,7 @@ public class Token : MonoBehaviour {
 
 		public void Awake(){			
 			rectTransform = this.GetComponent<RectTransform> ();
+			defaultSize = rectTransform.sizeDelta;
 			image = this.GetComponent<Image> ();
 		}
 
@@ -69,6 +74,7 @@ public class Token : MonoBehaviour {
 		/// <param name="index">Set Index for current token.</param>
 		/// <param name="isFinished">Is finished.</param>
 		public IEnumerator DriveToken(RectTransform destinationRectTransform,int index,Action<bool> isFinished,float moveBackOffset=1){
+			rectTransform.sizeDelta = defaultSize;
 			RectTransform originPlace = GetComponent<RectTransform> ();
 			iTween.ValueTo(this.gameObject, iTween.Hash(
 				"from",originPlace.anchoredPosition,
@@ -79,6 +85,7 @@ public class Token : MonoBehaviour {
 			));
 			pathIndex += index;
 			yield return new WaitForSeconds (timeToReachDestination*moveBackOffset);
+			rectTransform.anchoredPosition = destinationRectTransform.anchoredPosition;
 			isFinished (true);
 		}
 

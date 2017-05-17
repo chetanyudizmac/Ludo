@@ -50,6 +50,12 @@ public class BoardManager : MonoBehaviour {
 			Token.MoveToken -= MoveToken;
 			NextTurn = null;
 			StartGame = null;
+			Board.instance.region1.MakeMove = null;
+			Board.instance.region2.MakeMove = null;
+			Board.instance.region3.MakeMove = null;
+			Board.instance.region4.MakeMove = null;
+			currentActivatedeRegion = null;
+			activeRegionList.Clear ();
 		}
 
 		public void SetMode(){
@@ -90,7 +96,24 @@ public class BoardManager : MonoBehaviour {
 		public void NextTurnLocalMode(){
 			currentActivatedeRegion.Value.dice.DisableDice ();
 			currentActivatedeRegion=currentActivatedeRegion.NextOrFirst();
+			Debug.Log (currentActivatedeRegion.Value.gameObject.name);
 			currentActivatedeRegion.Value.dice.EnableDice ();
+		}
+
+
+		public bool RemoveRegion(){
+		  	
+			Debug.Log (currentActivatedeRegion.Value.gameObject.name);
+			currentActivatedeRegion.Value.ResetUI ();
+			currentActivatedeRegion = currentActivatedeRegion.PreviousOrLast();
+			activeRegionList.Remove(currentActivatedeRegion.NextOrFirst());
+			if (activeRegionList.Count != 1) {
+				Debug.Log ("game is on ");
+				return false;
+			} else {
+				Debug.Log ("gameover");
+				return true;
+			}
 		}
 
 		#region localMode
@@ -144,7 +167,6 @@ public class BoardManager : MonoBehaviour {
 			currentActivatedeRegion.Value.dice.DisableDice ();
 			currentActivatedeRegion=currentActivatedeRegion.NextOrFirst();
 			currentActivatedeRegion.Value.dice.EnableDice ();
-			currentActivatedeRegion.Value.OnRegionActivated ();
 		}
 		#endregion
 
@@ -155,8 +177,6 @@ public class BoardManager : MonoBehaviour {
 				
 			}
 		}
-		public void EndTurn(Token token){
-			token.region.EndTurn ();
-		}
+
 	}
 }

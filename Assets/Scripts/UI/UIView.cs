@@ -102,7 +102,6 @@ public class UIView : MonoBehaviour {
 	{
 		cam.enabled = false;
 		foreach (Canvas canvas in canvases) canvas.enabled = false;
-
 		Canvas.ForceUpdateCanvases();
 	}
 

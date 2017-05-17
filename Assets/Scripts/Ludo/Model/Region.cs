@@ -10,8 +10,6 @@ public class Region : MonoBehaviour {
 		public delegate void MakeMoveDelegate(Token token);
 		public MakeMoveDelegate  MakeMove;
 
-		public delegate void RegionActivated();
-		public RegionActivated OnRegionActivated;
 		//specific by time
 		public RegionType regionType;
 		public Token token;
@@ -25,31 +23,23 @@ public class Region : MonoBehaviour {
 		protected List<Token> tokenList = new List<Token>();
 		public List<RectTransform> tokenPosition = new List<RectTransform>();
 		public List<Tile> tokenPath = new List<Tile>();
-
-		public Dice dice;
-		public bool isAI;
-		public bool isKilled;
-		public bool isInYard;
+		public Dice dice;	
 		public bool isAnyTokenIsActivated;
 		Token activatedToken;   //prevents more than 1 token at single time
+
+		int tokenInHome=0;
 		public Region(){
+			
 		}
 
 		void OnEnable(){
-			OnRegionActivated += CheckIsAI;
 		}
 
 		void OnDisable(){
 			MakeMove = null;
-			OnRegionActivated = null;
 		}
 
-		public void CheckIsAI()
-		{
-			if (isAI) {
-				RollDice ();
-			}
-		}
+	
 		public int GetRemainingToken(){		
 			return 0;
 		}
@@ -115,7 +105,6 @@ public class Region : MonoBehaviour {
 					Debug.Log ("All Players in home. and you havent got 6");
 					EndTurn ();
 				} else {
-					Debug.Log ("gotcha");
 					foreach (Token token in tokenList) {
 						token.ActivateToken ();
 					}
@@ -124,32 +113,25 @@ public class Region : MonoBehaviour {
 			else {  
 				foreach (Token token in tokenList) {
 					if (number == 6) {
-						if (token.inHome) 
+						if (token.inYard) 
 							token.ActivateToken ();
 						
-						if ((token.pathIndex + number) < tokenPath.Count+1 && !token.inHome) 
+						if ((token.pathIndex + number) < tokenPath.Count+1 && !token.inYard) 
 							token.ActivateToken ();	
 						
 						
 					} else {
-						if ((token.pathIndex + number) < tokenPath.Count+1 && !token.inHome)
+						if ((token.pathIndex + number) < tokenPath.Count+1 && !token.inYard)
 							token.ActivateToken ();
 					}
 				}
 			}
 			List<Token> tokenToMove = new List<Token>();
-			int noOfTokenInDestinaion = 0;
-			NoOfActivatedToken (ref tokenToMove,ref noOfTokenInDestinaion);
-			Debug.Log (noOfTokenInDestinaion);
-			if (noOfTokenInDestinaion == 4) {
-				Debug.Log ("Win");
-			}
+		
+			NoOfActivatedToken (ref tokenToMove);
 			if (tokenToMove.Count == 1) {
 				tokenToMove [0].AutomatedTokenClicked (tokenToMove [0]);
-			} else if (isAI && tokenToMove.Count != 0) {
-				int no = Random.Range (0, tokenToMove.Count);
-				tokenToMove [no].AutomatedTokenClicked (tokenToMove [no]);
-			}
+			} 
 			if (!isAnyTokenIsActivated) {
 				EndTurn ();
 			}
@@ -166,8 +148,8 @@ public class Region : MonoBehaviour {
 			if (activatedToken!=null)
 				return;
 			activatedToken = token;
-			if (token.inHome) {	
-				token.inHome = false;
+			if (token.inYard) {	
+				token.inYard = false;
 				path.Add (tokenPath [0]);
 				StartCoroutine(MoveToken(path));
 			}
@@ -175,46 +157,48 @@ public class Region : MonoBehaviour {
 				for(int count=1;count<=dice.DiceNumber;count++){
 					path.Add (tokenPath[token.pathIndex+count]);
 				}
+				activatedToken.residingTile.ArrangeTokenInTile ();  // re arrange tokens
 				StartCoroutine(MoveToken(path));
 			}
 		}
 
-		public IEnumerator MoveToken(List<Tile> tokenPath){	
+		public IEnumerator MoveToken(List<Tile> path){	
 			
-			if(activatedToken.residingTile!=null)
-			activatedToken.residingTile.RemoveTokenInTile (activatedToken);
-			bool isFinished ;
+			if (activatedToken.residingTile != null) {
+				activatedToken.residingTile.RemoveTokenInTile (activatedToken);
+				activatedToken.residingTile.ArrangeTokenInTile ();
+			}
+				bool isFinished ;
 			WaitForEndOfFrame frame = new WaitForEndOfFrame ();
-			foreach (Tile tile in tokenPath) {
+			foreach (Tile tile in path) {
 				isFinished = false;
 				StartCoroutine(activatedToken.DriveToken(tile.tileUI.rectTransform,1,value=>isFinished=value));
 				while (!isFinished) {
 					yield return frame;
 				}
 			}
-			activatedToken.residingTile = tokenPath [tokenPath.Count - 1];
-			tokenPath [tokenPath.Count - 1].SetTokenInTile(activatedToken);
+			activatedToken.residingTile = path [path.Count - 1];
+			path [path.Count - 1].SetTokenInTile(activatedToken);
 			EndTurn ();
 		}
 		/// <summary>
 		/// Returns no of activated token
 		/// </summary>
 		/// <returns>The of activated token.</returns>
-		public bool NoOfActivatedToken(ref List<Token> tokenToMove,ref int noOfActivatedToken)
+		public bool NoOfActivatedToken(ref List<Token> tokenToMove)
 		{
-			int count=0;
+			//int count=0;
 			isAnyTokenIsActivated = false;
 			foreach (Token token in tokenList) {
 				if (token.isActivated) {
 					tokenToMove.Add (token);
 					isAnyTokenIsActivated = true;
 				}
-				if(token.residingTile!=null)
-				if (token.residingTile.isDestination) {
-					count++;
-				}
+//				if(token.residingTile!=null)
+//				if (token.residingTile.isDestination) {
+//					count++;
+//				}
 			}
-			noOfActivatedToken = count;
 			return isAnyTokenIsActivated;
 		}
 
@@ -225,8 +209,8 @@ public class Region : MonoBehaviour {
 			if (activatedToken!=null)
 				return;
 			activatedToken = token;
-			if (token.inHome) {	
-				token.inHome = false;
+			if (token.inYard) {	
+				token.inYard = false;
 				path.Add (tokenPath [0]);
 				StartCoroutine(MoveToken(path));
 			}
@@ -245,45 +229,65 @@ public class Region : MonoBehaviour {
 		public int TokenInYard(){
 			int count = 0;
 			foreach (Token token in tokenList) {
-				if (token.inHome) {
+				if (token.inYard) {
 					count++;
 				}
 			}
 			return count;
 		}
 
-		public void EndTurn(){			
+		public void EndTurn(){	
+			bool killedSomeone=false;
 			DeactivateRegion ();
 			if(activatedToken!=null)
-			if(!activatedToken.inHome)
+			if(!activatedToken.inYard)
 			if (activatedToken.residingTile != null) {
-				if (activatedToken.residingTile.tokenInTile.Count>1) {
+				if (activatedToken.residingTile == tokenPath [tokenPath.Count - 1]) { // if token reached to home
+					tokenInHome++;
+					activatedToken.inHome = true;
+					Debug.Log ("InHome");
+					if (tokenInHome == tokenList.Count) {   // if all token reached to home
+						Debug.Log ("all token in home player wins");
+						bool isGameover = BoardManager.instance.RemoveRegion ();
+						if (isGameover) {
+							return; // stop execution
+						} else {
+							BoardManager.instance.NextTurn ();
+							return;
+						}
+					} 
+					else {
+						activatedToken = null;
+						dice.EnableDice ();
+						return;
+					}
+				}
+				else if (activatedToken.residingTile.tokenInTile.Count>1) {
 					Token tokenToRemove = activatedToken.residingTile.TokenToKill (activatedToken);
-
 					if (tokenToRemove != null) {
 						Debug.Log ("kill");
 						StartCoroutine (DriveTokenToHome(tokenToRemove));
-						isKilled = true;
+						killedSomeone = true;
 						tokenToRemove.residingTile.RemoveTokenInTile (tokenToRemove);
 					} else {
-						Debug.Log ("same region available");
+						activatedToken.residingTile.ArrangeTokenInTile ();
 					}
 				}
 			}
 			activatedToken = null;
-			if (dice.DiceNumber == 6||isKilled||isInYard) {
-				isKilled = false;
-				isInYard = false;
+			if (dice.DiceNumber == 6||killedSomeone) {  // same region turn if dice number is 6 . killed someone or previous turn takes token to home
+				killedSomeone = false;
 				if (!isAnyTokenIsActivated) {
+					Debug.Log ("something wrong in region"+gameObject.name);
 					BoardManager.instance.NextTurn ();
 					return;
 				}
 				dice.EnableDice ();
-				OnRegionActivated ();
 			}
 			else {
 				BoardManager.instance.NextTurn ();
 			}
+
 		}
 
 		IEnumerator DriveTokenToHome(Token token){
@@ -308,7 +312,7 @@ public class Region : MonoBehaviour {
 			while (!isFinished) {
 				yield return frame;
 			}
-			token.inHome = true;
+			token.inYard = true;
 			token.inSafePlace = true;
 			token.residingTile = null;//irfan
 
@@ -316,11 +320,16 @@ public class Region : MonoBehaviour {
 			yield return null;
 		}
 
+
 		public void GetBackToHome(){
 			
 		}
 
 		public void CreateTokenInRegion(){
+		}
+
+		public void ResetUI(){
+			dice.DisableDice ();
 		}
 
 

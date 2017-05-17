@@ -47,5 +47,9 @@ public class Tile : MonoBehaviour {
 			return tokenToRemove;
 		}
 
+		public void ArrangeTokenInTile(){
+			tileUI.ArrangeTileUI (tokenInTile);
+		}
+
 }
 }
